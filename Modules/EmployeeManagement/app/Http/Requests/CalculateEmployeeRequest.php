@@ -4,7 +4,7 @@ namespace Modules\EmployeeManagement\app\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreEmployeeRequest extends FormRequest
+class CalculateEmployeeRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,9 +14,6 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'                    => 'required|string|max:255',
-            'email'                   => 'required|email|unique:employees,email',
-            'phone'                   => 'required|string|max:20',
             'designation'             => 'required|in:Intern,Associate,Senior,Manager',
             'monthly_salary_package'  => 'required|numeric|min:0',
         ];

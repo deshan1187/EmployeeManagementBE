@@ -8,6 +8,16 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 });
 
 Route::prefix('employee')->group(function () {
-    // add submission
-    Route::get('get', [EmployeeManagementController::class, 'index']);
+    //get all employee
+    Route::get('getall', [EmployeeManagementController::class, 'getAll']);
+    //calculate salary 
+    Route::post('calculate', [EmployeeManagementController::class, 'calculate']);
+    //store employee details
+    Route::post('store', [EmployeeManagementController::class, 'store']);
+    //update employee details
+    Route::put('update', [EmployeeManagementController::class, 'update']);
+    //search employee using phone
+    Route::get('search', [EmployeeManagementController::class, 'search']);
+    //delete employee
+    Route::delete('delete', [EmployeeManagementController::class, 'delete']);
 });

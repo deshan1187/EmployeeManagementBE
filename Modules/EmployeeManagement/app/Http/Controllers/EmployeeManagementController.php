@@ -4,14 +4,13 @@ namespace Modules\EmployeeManagement\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\EmployeeManagement\app\Models\Employee;
 use Modules\EmployeeManagement\app\Repositories\EmployeeInterface;
-//namespace App\Http\Controllers;
-
+use Modules\EmployeeManagement\app\Http\Requests\CalculateEmployeeRequest;
+use Modules\EmployeeManagement\app\Http\Requests\StoreEmployeeRequest;
+use Modules\EmployeeManagement\app\Http\Requests\UpdateEmployeeRequest;
 use Exception;
 
 class EmployeeManagementController extends Controller
-
 {
     protected $repositoryInterface;
 
@@ -20,10 +19,8 @@ class EmployeeManagementController extends Controller
         $this->repositoryInterface = $employeeInterface;
     }
 
-    /**
-     * Display a listing of employees
-     */
-    public function index()
+    //get all employee
+    public function getAll()
     {
         try {
             $employees = $this->repositoryInterface->getAllEmployees();
@@ -41,40 +38,119 @@ class EmployeeManagementController extends Controller
         }
     }
 
-
-    public function create()
+    //calculate salary 
+    public function calculate(CalculateEmployeeRequest $request)
     {
-        return view('employeemanagement::create');
+        $validatedData = $request->validated();
+        try {
+            $response = $this->repositoryInterface->calculate($validatedData);
+            return response()->json([
+                'success' => true,
+                'data'    => $response,
+                'message' => 'Calculated successfully'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    //store employee details
+    public function store(StoreEmployeeRequest $request)
     {
-        return view('employeemanagement::show');
+        $validatedData = $request->validated();
+
+        try {
+            $response = $this->repositoryInterface->store($validatedData);
+
+            return response()->json([
+                'success' => true,
+                'data'    => $response,
+                'message' => 'Employee created successfully'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    //update employee details
+    public function update(UpdateEmployeeRequest $request)
     {
-        return view('employeemanagement::edit');
+        $validatedData = $request->validated();
+
+        try {
+            $response = $this->repositoryInterface->update($validatedData);
+
+            return response()->json([
+                'success' => true,
+                'data'    => $response,
+                'message' => 'Employee updated successfully'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
+    //search employee using phone
+    public function search(Request $request)
+    {
+        $phone = $request->query('phone');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+        if (!$phone) {
+            return response()->json([
+                'success' => false,
+                'error'   => 'Phone number is required'
+            ], 422);
+        }
+
+        try {
+            $response = $this->repositoryInterface->searchByPhone($phone);
+
+            return response()->json([
+                'success' => true,
+                'data'    => $response,
+                'message' => 'Employees fetched successfully'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    //delete employee
+    public function delete(Request $request)
+    {
+        $id = $request->query('id');
+
+        if (!$id) {
+            return response()->json([
+                'success' => false,
+                'error'   => 'Employee id is required'
+            ], 422);
+        }
+
+        try {
+            $this->repositoryInterface->delete($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Employee deleted successfully'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
 }
